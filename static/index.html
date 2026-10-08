@@ -273,21 +273,13 @@
             border-color: #8a2be2;
             box-shadow: 0 0 20px rgba(138, 43, 226, 0.5), inset 0 0 10px rgba(88, 166, 255, 0.2);
             color: #ffffff;
+            outline: none;
         }
         [data-bs-theme="light"] .form-control:focus, [data-bs-theme="light"] .form-select:focus, [data-bs-theme="light"] .form-select:hover {
             background-color: rgba(255, 255, 255, 0.9);
             border-color: #4338ca;
             box-shadow: 0 0 20px rgba(67, 56, 202, 0.2);
             color: #0f172a;
-        }
-
-        button:focus, button:focus-visible,
-        .form-control:focus, .form-control:focus-visible,
-        .form-select:focus, .form-select:focus-visible,
-        input:focus, input:focus-visible,
-        textarea:focus, textarea:focus-visible {
-            outline: 2px solid var(--neon-blue);
-            outline-offset: 2px;
         }
 
         .form-control::placeholder {
@@ -506,7 +498,7 @@
                         
                         <div class="mb-3">
                             <label for="relationshipSelector" class="form-label">Relationship</label>
-                            <select class="form-select" id="relationshipSelector" aria-label="Select Relationship">
+                            <select class="form-select" id="relationshipSelector">
                                 <option value="Strict Boss">Strict Boss</option>
                                 <option value="Best Friend">Best Friend</option>
                                 <option value="Upset Client / Customer">Upset Client / Customer</option>
@@ -524,7 +516,7 @@
                         
                         <div class="mb-3">
                             <label for="toneSelector" class="form-label">Tone</label>
-                            <select class="form-select" id="toneSelector" aria-label="Select Tone">
+                            <select class="form-select" id="toneSelector">
                                 <option value="Professional & Polite" selected>Professional & Polite (Default)</option>
                                 <option value="Direct & Concise">Direct & Concise</option>
                                 <option value="Deeply Apologetic">Deeply Apologetic</option>
@@ -540,7 +532,7 @@
 
                         <div class="mb-4">
                             <label for="cultureSelector" class="form-label">Cultural Etiquette</label>
-                            <select class="form-select" id="cultureSelector" aria-label="Select Cultural Etiquette">
+                            <select class="form-select" id="cultureSelector">
                                 <option value="American Direct">American Direct</option>
                                 <option value="British Polite">British Polite</option>
                                 <option value="Japanese High-Context Corporate">Japanese High-Context Corporate</option>
@@ -551,7 +543,7 @@
 
                         <div class="mb-4">
                             <label for="modeSelector" class="form-label">Lumina Superpowers (Modes)</label>
-                            <select class="form-select" id="modeSelector" aria-label="Select Lumina Superpowers Mode">
+                            <select class="form-select" id="modeSelector">
                                 <option value="Standard" selected>Standard</option>
                                 <option value="Wingman Flirt Optimizer">Wingman Flirt Optimizer</option>
                                 <option value="Hype-Man Post Generator">Hype-Man Post Generator</option>
@@ -573,7 +565,7 @@
                             <div id="friendBubble" class="friend-bubble d-none">
                                 <span id="friendReactionText">Friend is typing<span class="typing-dots">...</span></span>
                             </div>
-                            <textarea class="form-control flex-grow-1 transition-all" id="draftText" style="min-height: 180px;" placeholder="Type your rough notes or draft here..." aria-label="Your rough draft text area"></textarea>
+                            <textarea class="form-control flex-grow-1 transition-all" id="draftText" style="min-height: 180px;" placeholder="Type your rough notes or draft here..."></textarea>
                         </div>
                         
                         <button class="btn w-100 mt-auto" id="rewriteBtn">
