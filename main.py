@@ -2,7 +2,7 @@ import os
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from google import genai
 
 app = FastAPI(title="Email Rewriter API")
