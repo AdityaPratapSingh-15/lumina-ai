@@ -1,5 +1,7 @@
 fastapi
 uvicorn
 google-genai
-pymongo
+motor
 dnspython
+pytest
+httpx

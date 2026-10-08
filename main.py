@@ -2,10 +2,28 @@ import os
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 from google import genai
+from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Optional
 
 app = FastAPI(title="Email Rewriter API")
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize the Gemini client (expects GEMINI_API_KEY environment variable)
 try:
@@ -14,10 +32,19 @@ except Exception as e:
     client = None
     print(f"Failed to initialize GenAI client: {e}")
 
-from typing import Optional
+MONGO_URI = os.environ.get("MONGO_URI")
+try:
+    if MONGO_URI:
+        mongo_client = AsyncIOMotorClient(MONGO_URI)
+        db = mongo_client.get_database("lumina_ai")
+    else:
+        mongo_client = None
+        db = None
+except Exception as e:
+    print(f"Failed to connect to MongoDB: {e}")
 
 class RewriteRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=5, max_length=2000)
     relationship_context: str = "University Professor"
     tone: str = "Professional & Polite"
     cultural_norm: str = "Global Neutral"
@@ -30,7 +57,7 @@ class RewriteResponse(BaseModel):
     dark_pattern_warning: Optional[str] = None
 
 class ReactRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=5, max_length=2000)
 
 class ReactResponse(BaseModel):
     reaction: str
