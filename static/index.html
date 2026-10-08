@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina AI | ToneShift.ai</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #000000;
+            --card-bg: rgba(13, 17, 23, 0.7);
+            --glass-border: rgba(138, 43, 226, 0.4);
+            --neon-purple: rgba(138, 43, 226, 0.6);
+            --neon-blue: rgba(88, 166, 255, 0.6);
+            --btn-gradient: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+            --text-primary: #ffffff;
+            --text-muted: #8b949e;
+            --text-indigo: #a5b4fc;
+        }
+
+        [data-bs-theme="light"] {
+            --bg-main: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(200, 200, 220, 0.6);
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --text-indigo: #4338ca;
+            /* In light mode, spotlight gradients change slightly to be pastel */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color 0s;
+        }
+
+        /* View Transition for Cinematic Toggle */
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+        ::view-transition-old(root) { z-index: 1; }
+        ::view-transition-new(root) { z-index: 9999; }
+        [data-bs-theme="dark"]::view-transition-old(root) { z-index: 9999; }
+        [data-bs-theme="dark"]::view-transition-new(root) { z-index: 1; }
+
+        /* Navbar & Toggle */
+        .navbar-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+        .theme-toggle {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        [data-bs-theme="light"] .theme-toggle {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Ambient Beacon Background */
+        .spotlight {
+            position: fixed;
+            bottom: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120vw;
+            height: 90vh;
+            background: radial-gradient(ellipse at bottom, rgba(138, 43, 226, 0.25) 0%, rgba(59, 130, 246, 0.15) 35%, transparent 70%);
+            filter: blur(80px);
+            z-index: -2;
+            pointer-events: none;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+        [data-bs-theme="light"] .spotlight {
+            background: radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15) 0%, rgba(59, 130, 246, 0.1) 35%, transparent 70%);
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.8; transform: translateX(-50%) scale(0.95); }
+            100% { opacity: 1.2; transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* Particles Canvas */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Parallax Hero Section */
+        .hero-section {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .hero-headline {
+            font-size: 5.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(180deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform-origin: center center;
+            will-change: transform;
+        }
+        [data-bs-theme="light"] .hero-headline {
+            background: linear-gradient(180deg, #0f172a 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subheadline {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            font-weight: 400;
+            margin-bottom: 4rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            font-size: 2rem;
+            color: var(--text-muted);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* Main App Container Overlay */
+        .app-overlay-wrapper {
+            position: relative;
+            z-index: 10;
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            padding-top: 60px;
+            padding-bottom: 100px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
+        }
+        [data-bs-theme="light"] .app-overlay-wrapper {
+            border-top: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.05);
+        }
+
+        .container-xl {
+            max-width: 1400px;
+        }
+
+        /* Premium Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.15), inset 0 0 20px rgba(88, 166, 255, 0.05);
+            padding: 1.8rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            /* Initial hidden state */
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        [data-bs-theme="light"] .glass-card {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08), inset 0 0 20px rgba(255, 255, 255, 0.8);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        .glass-card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass-card.reveal:hover {
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.3), inset 0 0 30px rgba(88, 166, 255, 0.1);
+            border-color: rgba(138, 43, 226, 0.7);
+            transform: translateY(-2px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        [data-bs-theme="light"] .glass-card.reveal:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12), inset 0 0 30px rgba(255, 255, 255, 1);
+            border-color: rgba(255,255,255,1);
+        }
+
+        /* Inputs & Textareas */
+        .form-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease-in-out;
+        }
+        [data-bs-theme="light"] .form-control, [data-bs-theme="light"] .form-select {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #0f172a;
+        }
+
+        .form-control:focus, .form-select:focus, .form-select:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-color: #8a2be2;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5), inset 0 0 10px rgba(88, 166, 255, 0.2);
+            color: #ffffff;
+            outline: none;
+        }
+        [data-bs-theme="light"] .form-control:focus, [data-bs-theme="light"] .form-select:focus, [data-bs-theme="light"] .form-select:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-color: #4338ca;
+            box-shadow: 0 0 20px rgba(67, 56, 202, 0.2);
+            color: #0f172a;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        [data-bs-theme="light"] .form-control::placeholder {
+            color: rgba(0,0,0,0.4);
+        }
+
+        .form-select option {
+            background-color: #0d1117;
+            color: #ffffff;
+        }
+        [data-bs-theme="light"] .form-select option {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        /* Primary Action Button */
+        #rewriteBtn {
+            background: var(--btn-gradient);
+            background-size: 200% auto;
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 1rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(138, 43, 226, 0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #rewriteBtn:hover:not(:disabled) {
+            background-position: right center;
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 0 60px rgba(138, 43, 226, 0.5);
+        }
+
+        #rewriteBtn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+            transform: none;
+        }
+        [data-bs-theme="light"] #rewriteBtn:disabled {
+            background: rgba(0, 0, 0, 0.05);
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Secondary Action Buttons */
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        [data-bs-theme="light"] .action-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        [data-bs-theme="light"] .action-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Output Area */
+        .read-only-area {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.2rem;
+            height: 100%;
+            color: #e6edf3;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        [data-bs-theme="light"] .read-only-area {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(0, 0, 0, 0.05);
+            color: #0f172a;
+        }
+        
+        .output-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: var(--text-indigo);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.4rem;
+        }
+        [data-bs-theme="light"] .output-title {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Minimal Loading Spinner */
+        .loader {
+            display: none;
+            width: 1.1rem;
+            height: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .spinner-border {
+            border-right-color: rgba(255,255,255,0.2);
+            border-bottom-color: rgba(255,255,255,0.2);
+            border-left-color: rgba(255,255,255,0.2);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert-danger {
+            background-color: rgba(248, 81, 73, 0.15);
+            border: 1px solid rgba(248, 81, 73, 0.4);
+            color: #ff7b72;
+            border-radius: 12px;
+        }
+            
+        /* Friend Chat Bubble */
+        .friend-bubble {
+            position: absolute;
+            top: 35px;
+            right: 15px;
+            max-width: 80%;
+            background: rgba(138, 43, 226, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 12px 12px 0 12px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            transform: translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        [data-bs-theme="light"] .friend-bubble {
+            background: rgba(236, 72, 153, 0.15);
+            border-color: rgba(236, 72, 153, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .friend-bubble.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .typing-dots {
+            animation: blink 1.4s infinite both;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+    <div class="spotlight"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navbar & Theme Toggle -->
+    <nav class="navbar-custom">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+            <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <!-- Parallax Sticky Hero -->
+    <header class="hero-section">
+        <h1 class="hero-headline">Lumina AI</h1>
+        <p class="hero-subheadline">The future of communication happens here</p>
+        <div class="scroll-indicator">
+            <i class="bi bi-chevron-down"></i>
+        </div>
+    </header>
+
+    <!-- Main Application Container Overlay -->
+    <div class="app-overlay-wrapper">
+        <div class="container-xl">
+            <div class="row g-4 align-items-stretch">
+                <!-- Left Column: Input (col-lg-4) -->
+                <div class="col-lg-4">
+                    <div class="glass-card scroll-target">
+                        <h5 class="fw-semibold mb-4 text-primary-theme">Draft Your Email</h5>
+                        
+                        <div class="mb-3">
+                            <label for="relationshipSelector" class="form-label">Relationship</label>
+                            <select class="form-select" id="relationshipSelector">
+                                <option value="Strict Boss">Strict Boss</option>
+                                <option value="Best Friend">Best Friend</option>
+                                <option value="Upset Client / Customer">Upset Client / Customer</option>
+                                <option value="University Professor" selected>University Professor</option>
+                                <option value="Recruiter / Hiring Manager">Recruiter / Hiring Manager</option>
+                                <option value="Colleague / Co-worker">Colleague / Co-worker</option>
+                                <option value="Direct Report (Employee)">Direct Report (Employee)</option>
+                                <option value="Roommate">Roommate</option>
+                                <option value="Landlord">Landlord</option>
+                                <option value="Family Member">Family Member</option>
+                                <option value="Customer Support Agent">Customer Support Agent</option>
+                                <option value="New Networking Contact">New Networking Contact</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="toneSelector" class="form-label">Tone</label>
+                            <select class="form-select" id="toneSelector">
+                                <option value="Professional & Polite" selected>Professional & Polite (Default)</option>
+                                <option value="Direct & Concise">Direct & Concise</option>
+                                <option value="Deeply Apologetic">Deeply Apologetic</option>
+                                <option value="Urgent / Time-Sensitive">Urgent / Time-Sensitive</option>
+                                <option value="Enthusiastic & Upbeat">Enthusiastic & Upbeat</option>
+                                <option value="Persuasive / Negotiating">Persuasive / Negotiating</option>
+                                <option value="Empathetic & Compassionate">Empathetic & Compassionate</option>
+                                <option value="Casual & Chill">Casual & Chill</option>
+                                <option value="Extremely Grateful">Extremely Grateful</option>
+                                <option value="Passive-Aggressive">Passive-Aggressive (Hackathon Easter Egg)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="cultureSelector" class="form-label">Cultural Etiquette</label>
+                            <select class="form-select" id="cultureSelector">
+                                <option value="American Direct">American Direct</option>
+                                <option value="British Polite">British Polite</option>
+                                <option value="Japanese High-Context Corporate">Japanese High-Context Corporate</option>
+                                <option value="Indian Corporate">Indian Corporate</option>
+                                <option value="Global Neutral" selected>Global Neutral</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="modeSelector" class="form-label">Lumina Superpowers (Modes)</label>
+                            <select class="form-select" id="modeSelector">
+                                <option value="Standard" selected>Standard</option>
+                                <option value="Wingman Flirt Optimizer">Wingman Flirt Optimizer</option>
+                                <option value="Hype-Man Post Generator">Hype-Man Post Generator</option>
+                                <option value="Hinglish Processor">Hinglish Processor</option>
+                                <option value="Regional Slang Localizer">Regional Slang Localizer</option>
+                                <option value="Colloquial Idiom Matcher">Colloquial Idiom Matcher</option>
+                                <option value="Drunk-Text Translator">Drunk-Text Translator</option>
+                                <option value="Voice-Cadence Mimic">Voice-Cadence Mimic</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="draftText" class="form-label mb-0">Your Rough Draft</label>
+                            <button id="inboundBtn" class="btn btn-sm btn-outline-warning" style="font-size: 0.75rem; border-radius: 8px;">
+                                <i class="bi bi-shield-exclamation"></i> Paste Inbound Message
+                            </button>
+                        </div>
+                        <div class="mb-4 flex-grow-1 d-flex flex-column position-relative">
+                            <div id="friendBubble" class="friend-bubble d-none">
+                                <span id="friendReactionText">Friend is typing<span class="typing-dots">...</span></span>
+                            </div>
+                            <textarea class="form-control flex-grow-1 transition-all" id="draftText" style="min-height: 180px;" placeholder="Type your rough notes or draft here..."></textarea>
+                        </div>
+                        
+                        <button class="btn w-100 mt-auto" id="rewriteBtn">
+                            <span class="spinner-border spinner-border-sm loader me-2" id="btnSpinner" role="status" aria-hidden="true"></span>
+                            <span id="btnText">Check Vibe</span>
+                        </button>
+
+                        <div id="errorAlert" class="alert alert-danger mt-3 mb-0 d-none" role="alert"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Output (col-lg-8) with Side-by-Side Comparison -->
+                <div class="col-lg-8">
+                    <div class="glass-card scroll-target">
+                        <h5 class="fw-semibold mb-4 text-primary-theme">Scenario Comparison</h5>
+                        <div id="darkPatternAlert" class="alert alert-warning mb-3 d-none" style="background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.5); color: #ffc107; font-weight: 600; font-size: 0.9rem;">
+                            <i class="bi bi-exclamation-triangle"></i> <span id="darkPatternText"></span>
+                        </div>
+                        
+                        <div class="row g-4 flex-grow-1">
+                            <!-- Left Output: Assertive -->
+                            <div class="col-md-6 d-flex flex-column">
+                                <div class="read-only-area d-flex flex-column" id="assertiveContainer">
+                                    <div class="output-title">Assertive Version</div>
+                                    <div id="assertiveText" class="flex-grow-1"><span class="text-muted" style="opacity: 0.6;">Your firm, decisive draft will appear here...</span></div>
+                                    <div class="d-flex gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(138, 148, 158, 0.2);">
+                                        <button class="action-btn" onclick="copyText('assertiveText', this)">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                        <button class="action-btn" onclick="sendEmail('assertiveText')">
+                                            <i class="bi bi-envelope-paper"></i> Send
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Output: Accommodating -->
+                            <div class="col-md-6 d-flex flex-column">
+                                <div class="read-only-area d-flex flex-column" id="accommodatingContainer">
+                                    <div class="output-title">Accommodating Version</div>
+                                    <div id="accommodatingText" class="flex-grow-1"><span class="text-muted" style="opacity: 0.6;">Your softer, flexible draft will appear here...</span></div>
+                                    <div class="d-flex gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(138, 148, 158, 0.2);">
+                                        <button class="action-btn" onclick="copyText('accommodatingText', this)">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                        <button class="action-btn" onclick="sendEmail('accommodatingText')">
+                                            <i class="bi bi-envelope-paper"></i> Send
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Dark/Light Mode Cinematic Toggle ---
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        themeToggle.addEventListener('click', (event) => {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            if (!document.startViewTransition) {
+                document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                themeIcon.className = nextTheme === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill';
+                return;
+            }
+
+            const x = event.clientX;
+            const y = event.clientY;
+            const endRadius = Math.hypot(
+                Math.max(x, innerWidth - x),
+                Math.max(y, innerHeight - y)
+            );
+
+            const transition = document.startViewTransition(() => {
+                document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                themeIcon.className = nextTheme === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill';
+            });
+
+            transition.ready.then(() => {
+                const clipPath = [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${endRadius}px at ${x}px ${y}px)`
+                ];
+                document.documentElement.animate(
+                    {
+                        clipPath: currentTheme === 'dark' ? [...clipPath].reverse() : clipPath,
+                    },
+                    {
+                        duration: 600,
+                        easing: 'ease-in-out',
+                        pseudoElement: currentTheme === 'dark' ? '::view-transition-old(root)' : '::view-transition-new(root)',
+                    }
+                );
+            });
+        });
+
+        // --- Intersection Observer for Scroll Reveal ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal');
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.scroll-target').forEach(el => observer.observe(el));
+            
+            // --- Scroll-Linked Typography Scaling ---
+            const heroHeadline = document.querySelector('.hero-headline');
+            if (heroHeadline) {
+                window.addEventListener('scroll', () => {
+                    const scrollY = window.scrollY;
+                    // Scale from 1 down to 0.5 over 600px of scroll
+                    let scale = 1 - (scrollY / 600) * 0.5;
+                    if (scale < 0.5) scale = 0.5;
+                    if (scale > 1) scale = 1;
+                    heroHeadline.style.transform = `scale(${scale})`;
+                });
+            }
+        });
+
+        // --- Particle Canvas Logic ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.1 + 0.7;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+                this.opacity = Math.random() * 0.6 + 0.1;
+                this.speedY = Math.random() * -0.3 - 0.1;
+            }
+            update() {
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                    this.baseX = this.x;
+                }
+                let dx = mouseX - this.x;
+                let dy = mouseY - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let forceDirectionX = dx / distance;
+                
+                if (distance < 300) {
+                    this.x -= forceDirectionX * (300 - distance) * 0.005;
+                } else {
+                    if (this.x !== this.baseX) {
+                        let dxBase = this.baseX - this.x;
+                        this.x += dxBase * 0.01;
+                    }
+                }
+            }
+            draw() {
+                const isLight = document.documentElement.getAttribute('data-bs-theme') === 'light';
+                ctx.fillStyle = isLight ? `rgba(100, 110, 120, ${this.opacity})` : `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 300; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- Friend Reaction Logic ---
+        const draftTextInput = document.getElementById('draftText');
+        const friendBubble = document.getElementById('friendBubble');
+        const friendReactionText = document.getElementById('friendReactionText');
+        
+        draftTextInput.addEventListener('paste', (e) => {
+            let pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (pastedText.trim().length < 10) return; 
+
+            friendBubble.classList.remove('d-none');
+            setTimeout(() => friendBubble.classList.add('show'), 10);
+            friendReactionText.innerHTML = 'Friend is typing<span class="typing-dots">...</span>';
+
+            fetch('/react', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: pastedText })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const reaction = data.reaction;
+                if (!reaction || reaction === 'NONE') {
+                    friendBubble.classList.remove('show');
+                    setTimeout(() => friendBubble.classList.add('d-none'), 400);
+                } else {
+                    friendReactionText.textContent = "✨ " + reaction;
+                }
+            })
+            .catch(err => {
+                friendBubble.classList.remove('show');
+                setTimeout(() => friendBubble.classList.add('d-none'), 400);
+            });
+        });
+
+        // --- Mood Ring (Live Keystroke Sentiment) ---
+        let sentimentTimeout;
+        draftTextInput.addEventListener('keyup', () => {
+            clearTimeout(sentimentTimeout);
+            sentimentTimeout = setTimeout(() => {
+                const text = draftTextInput.value;
+                if(text.trim().length < 5) {
+                    draftTextInput.style.boxShadow = '';
+                    draftTextInput.style.borderColor = '';
+                    return;
+                }
+                fetch('/sentiment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                }).then(res => res.json()).then(data => {
+                    const sentiment = data.sentiment;
+                    if(sentiment === 'angry') {
+                        draftTextInput.style.boxShadow = '0 0 20px rgba(248, 81, 73, 0.4)';
+                        draftTextInput.style.borderColor = '#f85149';
+                    } else if (sentiment === 'calm') {
+                        draftTextInput.style.boxShadow = '0 0 20px rgba(88, 166, 255, 0.4)';
+                        draftTextInput.style.borderColor = '#58a6ff';
+                    } else if (sentiment === 'affectionate') {
+                        draftTextInput.style.boxShadow = '0 0 20px rgba(255, 105, 180, 0.4)';
+                        draftTextInput.style.borderColor = 'hotpink';
+                    }
+                }).catch(err => console.error(err));
+            }, 500);
+        });
+
+        // --- Inbound Mode Toggle ---
+        let isInboundMode = false;
+        const inboundBtn = document.getElementById('inboundBtn');
+        inboundBtn.addEventListener('click', () => {
+            isInboundMode = !isInboundMode;
+            if (isInboundMode) {
+                inboundBtn.classList.replace('btn-outline-warning', 'btn-warning');
+                inboundBtn.innerHTML = '<i class="bi bi-shield-check"></i> Inbound Mode Active';
+            } else {
+                inboundBtn.classList.replace('btn-warning', 'btn-outline-warning');
+                inboundBtn.innerHTML = '<i class="bi bi-shield-exclamation"></i> Paste Inbound Message';
+            }
+        });
+
+        // --- Backend Fetch & Logic ---
+        document.getElementById('rewriteBtn').addEventListener('click', async () => {
+            const draftText = document.getElementById('draftText').value;
+            const relationship = document.getElementById('relationshipSelector').value;
+            const tone = document.getElementById('toneSelector').value;
+            const culture = document.getElementById('cultureSelector').value;
+            const mode = document.getElementById('modeSelector').value;
+            
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const rewriteBtn = document.getElementById('rewriteBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const darkPatternAlert = document.getElementById('darkPatternAlert');
+            const darkPatternText = document.getElementById('darkPatternText');
+            
+            const assertiveText = document.getElementById('assertiveText');
+            const accommodatingText = document.getElementById('accommodatingText');
+
+            if (!draftText.trim()) {
+                errorAlert.textContent = "Please enter some text to check vibes.";
+                errorAlert.classList.remove('d-none');
+                return;
+            }
+
+            // Reset UI
+            errorAlert.classList.add('d-none');
+            darkPatternAlert.classList.add('d-none');
+            btnText.textContent = "Thinking...";
+            btnSpinner.style.display = "inline-block";
+            rewriteBtn.disabled = true;
+            assertiveText.innerHTML = '<span class="text-muted" style="opacity:0.6;">Thinking...</span>';
+            accommodatingText.innerHTML = '<span class="text-muted" style="opacity:0.6;">Thinking...</span>';
+
+            try {
+                const response = await fetch('/rewrite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: draftText, 
+                        relationship_context: relationship, 
+                        tone: tone,
+                        cultural_norm: culture,
+                        specialized_mode: mode,
+                        is_inbound: isInboundMode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "An error occurred.");
+                }
+
+                if (data.dark_pattern_warning && data.dark_pattern_warning !== "null" && data.dark_pattern_warning.trim() !== "") {
+                    darkPatternText.textContent = data.dark_pattern_warning;
+                    darkPatternAlert.classList.remove('d-none');
+                }
+
+                // Split tokens for both
+                const tokensAssertive = data.assertive_version.split(/(\s+)/);
+                const tokensAccommodating = data.accommodating_version.split(/(\s+)/);
+                
+                assertiveText.textContent = '';
+                accommodatingText.textContent = '';
+                
+                let iA = 0;
+                let iB = 0;
+                
+                function typeWriter() {
+                    let stillTyping = false;
+                    if (iA < tokensAssertive.length) {
+                        assertiveText.textContent += tokensAssertive[iA];
+                        iA++;
+                        stillTyping = true;
+                    }
+                    if (iB < tokensAccommodating.length) {
+                        accommodatingText.textContent += tokensAccommodating[iB];
+                        iB++;
+                        stillTyping = true;
+                    }
+                    
+                    if (stillTyping) {
+                        setTimeout(typeWriter, 30);
+                    } else {
+                        btnText.textContent = "Check Vibe";
+                        btnSpinner.style.display = "none";
+                        rewriteBtn.disabled = false;
+                    }
+                }
+                typeWriter();
+
+            } catch (error) {
+                errorAlert.textContent = error.message;
+                errorAlert.classList.remove('d-none');
+                assertiveText.innerHTML = '<span class="text-muted" style="opacity:0.6;">Error</span>';
+                accommodatingText.innerHTML = '<span class="text-muted" style="opacity:0.6;">Error</span>';
+                
+                btnText.textContent = "Check Vibe";
+                btnSpinner.style.display = "none";
+                rewriteBtn.disabled = false;
+            }
+        });
+
+        // Helper functions for inline onclick handlers
+        window.copyText = function(elementId, btnElem) {
+            const text = document.getElementById(elementId).textContent;
+            if (text && !text.includes('will appear here') && !text.includes('Thinking...') && !text.includes('Error')) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = btnElem.innerHTML;
+                    btnElem.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+                    setTimeout(() => { btnElem.innerHTML = originalText; }, 2000);
+                }).catch(err => console.error('Failed to copy', err));
+            }
+        };
+
+        window.sendEmail = function(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            if (text && !text.includes('will appear here') && !text.includes('Thinking...') && !text.includes('Error')) {
+                window.location.href = `mailto:?body=${encodeURIComponent(text)}`;
+            }
+        };
+    </script>
+</body>
+</html>
