@@ -1,45 +1,64 @@
-# Email Rewriter Backend
+# Lumina AI | ToneShift.ai
 
-This is a lightweight Python FastAPI backend that takes user text, sends it to the Gemini API (using the new `client.interactions.create` endpoint) with a system prompt to rewrite emails, and returns the response.
+Lumina AI is a highly interactive, fast, and modern web application that uses the Gemini API to intelligently rewrite and adjust the tone of emails, messages, and social media posts.
 
-## Setup
+It features a high-production Dark Mode user interface built with HTML/CSS and glassmorphism styling, a backend driven by FastAPI, strict Pydantic input validation, and asynchronous database connections.
 
-1. The dependencies have already been installed in a virtual environment (`.venv`).
-2. You will need a Gemini API key. Set it as an environment variable before running the application.
+## Features
 
+- **A/B Output Comparisons**: Simultaneously generate Assertive and Accommodating versions of your text with a smooth typewriter reveal.
+- **Mood Ring**: Live keystroke sentiment analysis that changes the input border color dynamically based on tone (Angry, Calm, Affectionate).
+- **Lumina Superpowers**: Specialized rewrite modes, including *Wingman Flirt Optimizer*, *Hype-Man Post Generator*, and *Drunk-Text Translator*.
+- **Inbound Analysis**: Toggle Inbound Mode to detect manipulation or gaslighting (Dark Patterns) before you reply.
+- **Cinematic Theme Toggle**: Seamless View Transitions API-driven clip-path animations between Dark and Light mode.
+- **Accessibility & Security**: Screen-reader ready with ARIA labels, strictly validated endpoints (Pydantic), and locked-down CORS policies for production.
+
+## Tech Stack
+
+- **Backend**: Python 3.11, FastAPI, Uvicorn, Google GenAI SDK, AsyncIOMotorClient (Motor)
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla), Bootstrap 5
+- **Deployment**: Vercel & Docker
+
+## Setup & Installation
+
+### 1. Clone the repository
 ```bash
-export GEMINI_API_KEY="your-api-key-here"
+git clone https://github.com/AdityaPratapSingh-15/lumina-ai.git
+cd lumina-ai
 ```
 
-## Running the Server
-
-Start the FastAPI application using `uvicorn`:
-
+### 2. Set up the environment
+Create a virtual environment and install the required dependencies:
 ```bash
+python -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 3. Environment Variables
+Copy the example environment file and add your credentials:
+```bash
+cp .env.example .env
+```
+Ensure you provide a valid `GEMINI_API_KEY` inside `.env`.
+
+### 4. Run the Development Server
+```bash
 uvicorn main:app --reload
 ```
+Navigate to [http://localhost:8000](http://localhost:8000) in your browser.
 
-The server will be running at `http://127.0.0.1:8000`.
+## Testing
 
-## Testing the Endpoints
-
-### 1. Health Check
+The project includes a suite of automated tests. Run them using pytest:
 ```bash
-curl http://127.0.0.1:8000/
-```
-**Expected Response:**
-```json
-{"status":"ok","message":"Email Rewriter API is running"}
+pytest tests/
 ```
 
-### 2. Rewrite Email
+## Docker Deployment
+
+To run the application inside a Docker container:
 ```bash
-curl -X POST "http://127.0.0.1:8000/rewrite" \
-     -H "Content-Type: application/json" \
-     -d '{"text": "Hey there, just following up on that thing."}'
-```
-**Expected Response:**
-```json
-{"rewritten_text":"..."}
+docker build -t lumina-ai .
+docker run -p 8080:8080 -e PORT=8080 -e GEMINI_API_KEY="your-api-key" lumina-ai
 ```
